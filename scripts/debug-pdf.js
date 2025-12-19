@@ -1,0 +1,9 @@
+const pdf = require('pdf-parse');
+
+console.log('--- DEBUG PDF-PARSE ---');
+console.log('Type of export:', typeof pdf);
+console.log('Is function?', typeof pdf === 'function');
+console.log('Has default?', 'default' in pdf);
+console.log('Keys:', Object.keys(pdf));
+console.log('Value:', pdf);
+console.log('--- END DEBUG ---');
