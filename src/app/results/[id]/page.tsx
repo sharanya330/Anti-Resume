@@ -52,7 +52,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
             <div className={styles.grid}>
                 {/* Rejection Letter */}
                 <section className={styles.letterSection}>
-                    <h2 className={styles.sectionTitle}>The Verdict</h2>
+                    <h2 className={styles.sectionTitle}>Simulated Rejection Report</h2>
                     <div className={styles.letter}>
                         <pre className={styles.letterContent}>{analysis.rejectionLetter}</pre>
                     </div>

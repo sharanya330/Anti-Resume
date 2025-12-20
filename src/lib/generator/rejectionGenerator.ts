@@ -41,22 +41,19 @@ export function generateRejectionLetter(candidateName: string | undefined, resul
     const reasonList = reasons.map(r => `• ${r}`).join('\n');
 
     return `
-Subject: Application Status: REJECTED
+ANALYSIS REPORT: Why this resume gets rejected
 
 Date: ${date}
+Candidate: ${name}
 
-Dear ${name},
+SUMMARY:
+This resume is currently optimized for rejection. Based on our simulation, it would likely be dropped during the initial screening phases.
 
-Your application for the Software Engineer position has been rejected.
-
-Reasons for failure:
+CRITICAL FAILURE POINTS:
 
 ${reasonList}
 
-This decision is final.
-
-Sincerely,
-
-The Anti-Resume Hiring Committee
+DIAGNOSIS:
+The issues above represent the primary "red flags" that trigger automated or manual rejection. Address these to survive the first 6 seconds of a recruiter's scan.
   `.trim();
 }
