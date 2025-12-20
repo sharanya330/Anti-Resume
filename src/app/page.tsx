@@ -1,3 +1,5 @@
+'use client';
+
 import FileUpload from "@/components/FileUpload";
 import styles from "./page.module.css";
 import { ArrowDown, CheckCircle2, AlertTriangle, Shield, Zap, FileSearch, BrainCircuit } from 'lucide-react';
