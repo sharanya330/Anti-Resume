@@ -1,87 +1,56 @@
 import { ParsedResume } from './types';
 import { extractStructure } from './structureExtractor';
 // @ts-ignore
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
-
-// Polyfill for pdfjs-dist in Node environment
-if (typeof Promise.withResolvers === 'undefined') {
-    // @ts-ignore
-    Promise.withResolvers = function () {
-        let resolve, reject;
-        const promise = new Promise((res, rej) => {
-            resolve = res;
-            reject = rej;
-        });
-        return { promise, resolve, reject };
-    };
-}
-
-// @ts-ignore
-if (typeof DOMMatrix === 'undefined') {
-    // @ts-ignore
-    global.DOMMatrix = class DOMMatrix { };
-}
+import PDFParser from 'pdf2json';
 
 export async function parsePdf(buffer: Buffer): Promise<ParsedResume> {
-    try {
-        // Convert Buffer to Uint8Array
-        const data = new Uint8Array(buffer);
+    return new Promise((resolve, reject) => {
+        const pdfParser = new PDFParser(null, 1); // 1 = text only
 
-        // Load the document
-        const loadingTask = pdfjsLib.getDocument({
-            data,
-            useSystemFonts: true,
-            disableFontFace: true,
-            verbosity: 0
+        pdfParser.on('pdfParser_dataError', (errData: any) => {
+            console.error('PDF Parsing Error:', errData.parserError);
+            reject(new Error(`Failed to parse PDF: ${errData.parserError}`));
         });
 
-        const doc = await loadingTask.promise;
-        const numPages = doc.numPages;
-        let fullText = '';
-        let info: any = {};
+        pdfParser.on('pdfParser_dataReady', (pdfData: any) => {
+            try {
+                // Extract text from pages
+                // pdf2json returns URL-encoded text
+                const rawText = pdfParser.getRawTextContent();
 
-        try {
-            const meta = await doc.getMetadata();
-            info = meta.info || {};
-        } catch (e) {
-            // ignore
-        }
+                if (!rawText || rawText.trim().length < 50) {
+                    reject(new Error('PDF content too short or empty.'));
+                    return;
+                }
 
-        for (let i = 1; i <= numPages; i++) {
-            const page = await doc.getPage(i);
-            const textContent = await page.getTextContent();
-            const pageText = textContent.items.map((item: any) => item.str).join(' ');
-            fullText += pageText + '\n\n';
-        }
+                const structure = extractStructure(rawText);
 
-        if (fullText.trim().length < 50) {
-            throw new Error('PDF content too short or empty.');
-        }
+                // Calculate confidence score
+                let confidenceScore = 50;
+                if (structure.experience.length > 0) confidenceScore += 15;
+                if (structure.education.length > 0) confidenceScore += 15;
+                if (structure.skills.length > 0) confidenceScore += 10;
+                if (structure.contact.email) confidenceScore += 10;
 
-        const structure = extractStructure(fullText);
+                // Extract metadata if available
+                const metadata = {
+                    pageCount: pdfData.Pages ? pdfData.Pages.length : 0,
+                    author: pdfData.Meta ? pdfData.Meta.Author : undefined,
+                    producer: pdfData.Meta ? pdfData.Meta.Producer : undefined,
+                };
 
-        let confidenceScore = 50;
-        if (structure.experience.length > 0) confidenceScore += 15;
-        if (structure.education.length > 0) confidenceScore += 15;
-        if (structure.skills.length > 0) confidenceScore += 10;
-        if (structure.contact.email) confidenceScore += 10;
+                resolve({
+                    rawText,
+                    metadata,
+                    structure,
+                    confidenceScore: Math.min(confidenceScore, 100),
+                });
+            } catch (err: any) {
+                reject(new Error(`Failed to process PDF text: ${err.message}`));
+            }
+        });
 
-        return {
-            rawText: fullText,
-            metadata: {
-                pageCount: numPages,
-                author: info.Author,
-                producer: info.Producer,
-            },
-            structure,
-            confidenceScore: Math.min(confidenceScore, 100),
-        };
-
-    } catch (error: any) {
-        console.error('PDF Parsing Error:', error);
-        if (error.name === 'PasswordException') {
-            throw new Error('PDF is password protected.');
-        }
-        throw new Error(`Failed to parse PDF: ${error.message}`);
-    }
+        // Load the buffer
+        pdfParser.parseBuffer(buffer);
+    });
 }
