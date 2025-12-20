@@ -5,27 +5,41 @@ import { useEffect, useState } from 'react';
 const STORAGE_KEY = 'anon_user_id';
 
 export function useAnalytics() {
-    const [anonId, setAnonId] = useState<string | null>(null);
+    // Use lazy initialization to read from localStorage immediately on mount (client-side)
+    const [anonId, setAnonId] = useState<string | null>(() => {
+        if (typeof window === 'undefined') return null;
 
-    useEffect(() => {
-        // Initialize anonymous ID
         let id = localStorage.getItem(STORAGE_KEY);
         if (!id) {
             id = crypto.randomUUID();
             localStorage.setItem(STORAGE_KEY, id);
         }
-        setAnonId(id);
-    }, []);
+        return id;
+    });
+
+    useEffect(() => {
+        // Ensure ID is set if it wasn't (e.g. during SSR hydration mismatch, though unlikely with the check above)
+        if (!anonId && typeof window !== 'undefined') {
+            let id = localStorage.getItem(STORAGE_KEY);
+            if (!id) {
+                id = crypto.randomUUID();
+                localStorage.setItem(STORAGE_KEY, id);
+            }
+            setAnonId(id);
+        }
+    }, [anonId]);
 
     useEffect(() => {
         if (anonId) {
             // Track page view once ID is ready
+            // We use a flag to prevent double tracking in React Strict Mode if needed, 
+            // but for now let's just rely on the effect.
             trackEvent('page_view', { path: window.location.pathname });
         }
     }, [anonId]);
 
     const trackEvent = async (eventName: string, metadata: Record<string, any> = {}) => {
-        if (!anonId) return; // Wait for ID to be initialized
+        if (!anonId) return;
 
         try {
             await fetch('/api/analytics', {
@@ -43,7 +57,6 @@ export function useAnalytics() {
                 }),
             });
         } catch (err) {
-            // Fail silently - analytics should not break the app
             console.warn('Analytics failed:', err);
         }
     };

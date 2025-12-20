@@ -21,6 +21,10 @@ export function evaluateAts(resume: ParsedResume, jobRole: string = 'Software En
     const structuredErrors: StructuredError[] = [];
     let score = 100;
 
+    // 0. Deterministic Normalization
+    // Ensure inputs are canonicalized to prevent non-determinism
+    const normalizedText = resume.rawText.trim().toLowerCase().replace(/\s+/g, ' ');
+
     // Normalize role
     const normalizedRole = Object.keys(ROLE_KEYWORDS).find(r => jobRole.toLowerCase().includes(r)) || 'general';
     const keywords = ROLE_KEYWORDS[normalizedRole];
@@ -61,8 +65,8 @@ export function evaluateAts(resume: ParsedResume, jobRole: string = 'Software En
     });
 
     // 3. Keyword Matching
-    const textLower = resume.rawText.toLowerCase();
-    const foundKeywords = keywords.filter(kw => textLower.includes(kw));
+    // Use the deterministic normalized text
+    const foundKeywords = keywords.filter(kw => normalizedText.includes(kw));
     const keywordMatchRatio = foundKeywords.length / keywords.length;
 
     if (keywordMatchRatio < 0.3) {
