@@ -35,6 +35,12 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
         return <XCircle size={24} />;
     };
 
+    const getVerdictLabel = (verdict: string) => {
+        if (verdict === 'PASS') return 'PASS';
+        if (verdict === 'BORDERLINE') return 'WEAK';
+        return 'FAIL';
+    };
+
     return (
         <div className={styles.container}>
             <header className={styles.header}>
@@ -63,7 +69,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
                                 <h3>ATS Bot</h3>
                             </div>
                         </div>
-                        <div className={styles.verdict}>{ats.verdict}</div>
+                        <div className={styles.verdict}>{getVerdictLabel(ats.verdict)}</div>
                         <ul className={styles.issueList}>
                             {ats.issues.map((issue: string, i: number) => (
                                 <li key={i}>{issue}</li>
@@ -79,7 +85,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
                                 <h3>Recruiter (6s Scan)</h3>
                             </div>
                         </div>
-                        <div className={styles.verdict}>{recruiter.verdict}</div>
+                        <div className={styles.verdict}>{getVerdictLabel(recruiter.verdict)}</div>
                         <ul className={styles.issueList}>
                             {recruiter.comments.map((comment: string, i: number) => (
                                 <li key={i}>{comment}</li>
@@ -95,7 +101,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
                                 <h3>Senior Engineer</h3>
                             </div>
                         </div>
-                        <div className={styles.verdict}>{engineer.verdict}</div>
+                        <div className={styles.verdict}>{getVerdictLabel(engineer.verdict)}</div>
                         <p className={styles.summary}>"{engineer.summary}"</p>
                         <ul className={styles.issueList}>
                             {engineer.technicalCriticisms.map((crit: string, i: number) => (

@@ -41,21 +41,19 @@ export function generateRejectionLetter(candidateName: string | undefined, resul
     const reasonList = reasons.map(r => `• ${r}`).join('\n');
 
     return `
-Subject: Update on your application - Anti-Resume
+Subject: Application Status: REJECTED
 
 Date: ${date}
 
 Dear ${name},
 
-Thank you for your interest in the Software Engineer position at Anti-Resume.
+Your application for the Software Engineer position has been rejected.
 
-We have reviewed your application and, unfortunately, we will not be moving forward with your candidacy at this time.
-
-Our decision was based on the following factors identified during our screening process:
+Reasons for failure:
 
 ${reasonList}
 
-We do not provide further feedback on this decision.
+This decision is final.
 
 Sincerely,
 
