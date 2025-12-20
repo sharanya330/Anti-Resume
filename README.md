@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# Anti-Resume
 
-First, run the development server:
+**What’s stopping your resume from getting selected?
+Anti-Resume helps you find out — clearly, fairly, and honestly.**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Anti-Resume is an intelligent resume evaluation and improvement system that analyzes resumes the way **real hiring pipelines do**—through ATS filters, recruiter screening, and engineering review—to identify **exact blockers** preventing shortlisting and guide users in fixing them **without exaggeration or false claims**.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This project focuses on **clarity, alignment, and evidence**, not cosmetic enhancement.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## What Anti-Resume Does
 
-## Learn More
+Anti-Resume evaluates resumes in three practical stages, mirroring real-world hiring workflows.
 
-To learn more about Next.js, take a look at the following resources:
+### 1. ATS Readiness Analysis
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* Resume parsing confidence and structure validation
+* Layout and formatting risk detection
+* Keyword coverage against target job roles
+* Missing or weakly supported skills identification
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Outcome:** A transparent readiness score with clear improvement areas.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 2. Recruiter Readability Review
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* First-scan signal clarity (6–8 second review)
+* Bullet structure and consistency
+* Generic vs role-specific content detection
+* Visibility of outcomes and impact
+
+**Outcome:** Clear guidance on what improves shortlisting chances.
+
+---
+
+### 3. Engineering Depth Assessment
+
+* Skill-to-project evidence mapping
+* Detection of shallow or unsupported technical claims
+* Evaluation of system-level thinking (auth flows, data handling, error cases)
+* Identification of areas needing stronger technical explanation
+
+**Outcome:** Actionable feedback focused on technical credibility.
+
+---
+
+## Guided Resume Improvement (AI-Assisted)
+
+Anti-Resume includes a **controlled AI correction engine** designed to help users improve their resumes responsibly:
+
+* Modifies only issues **explicitly identified by analysis**
+* Makes **minimal, traceable edits**
+* Never adds unverified experience, skills, or metrics
+* Requires **user approval** for all changes
+* Re-evaluates the resume to show measurable improvement
+
+This ensures the resume stays **truthful, aligned, and defensible**.
+
+---
+
+## Why Anti-Resume Is Different
+
+* Focuses on **selection blockers**, not surface-level polish
+* Makes ATS and recruiter decisions **understandable**
+* Uses AI with **clear constraints and accountability**
+* Treats resumes as **engineering artifacts**, not marketing content
+
+The goal is not to “game the system,” but to **meet it clearly and confidently**.
+
+---
+
+## Tech Stack
+
+* **Frontend:** Next.js (App Router), TypeScript
+* **Backend:** Node.js
+* **Resume Parsing:** `pdf-parse`, `mammoth`
+* **Database:** MongoDB / PostgreSQL
+* **Design:** Modular, rule-driven, production-focused
+
+---
+
+## Who This Is For
+
+* Candidates who want precise, actionable feedback
+* Engineers who value clarity over buzzwords
+* Recruiters interested in explainable screening logic
+* Anyone curious about how hiring decisions are actually made
+
+---
+
+## Project Philosophy
+
+> Selection improves when clarity improves.
+> Anti-Resume helps you remove what’s holding you back.
+
