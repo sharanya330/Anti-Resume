@@ -11,9 +11,6 @@ export default function Home() {
       <section className={styles.hero}>
         <div className={styles.heroBackground}></div>
         <div className={styles.heroContent}>
-          <div className={`${styles.badge} animate-fade-in`}>
-            <span>Beta v1.0</span>
-          </div>
           <h1 className={`${styles.title} animate-fade-in animate-delay-100`}>
             Why aren't you getting hired?
           </h1>
