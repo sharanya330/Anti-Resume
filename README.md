@@ -95,4 +95,3 @@ The goal is not to “game the system,” but to **meet it clearly and confident
 
 > Selection improves when clarity improves.
 > Anti-Resume helps you remove what’s holding you back.
-
