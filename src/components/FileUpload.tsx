@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { Upload, FileText, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import styles from './FileUpload.module.css';
 import { useRouter } from 'next/navigation';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 export default function FileUpload() {
     const [jobRole, setJobRole] = useState('Software Engineer');
@@ -12,6 +13,7 @@ export default function FileUpload() {
     const [isLoading, setIsLoading] = useState(false);
     const [progressMessage, setProgressMessage] = useState('');
     const router = useRouter();
+    const { trackEvent } = useAnalytics();
 
     const handleDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -40,6 +42,8 @@ export default function FileUpload() {
         setError(null);
         setIsLoading(true);
         setProgressMessage('Parsing resume...');
+
+        trackEvent('analysis_started', { jobRole });
 
         const progressInterval = setInterval(() => {
             setProgressMessage(prev => {
@@ -73,6 +77,7 @@ export default function FileUpload() {
 
             if (data.data && data.data._id) {
                 clearInterval(progressInterval);
+                trackEvent('analysis_completed', { success: true });
                 router.push(`/results/${data.data._id}`);
             } else {
                 throw new Error('No ID returned');

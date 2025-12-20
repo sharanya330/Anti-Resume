@@ -114,6 +114,9 @@ export default function Home() {
         </div>
         <div className={styles.copyright}>
           © {new Date().getFullYear()} Anti-Resume. Open Source.
+          <p style={{ fontSize: '0.8rem', opacity: 0.7, marginTop: '5px' }}>
+            Resumes are processed in-memory and never stored. Only anonymous usage statistics are collected.
+          </p>
         </div>
       </footer>
     </div>
