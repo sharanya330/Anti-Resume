@@ -1,5 +1,7 @@
 import { ParsedResume } from './types';
 import { extractStructure } from './structureExtractor';
+// @ts-ignore
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 // Polyfill for pdfjs-dist in Node environment
 if (typeof Promise.withResolvers === 'undefined') {
@@ -20,23 +22,44 @@ if (typeof DOMMatrix === 'undefined') {
     global.DOMMatrix = class DOMMatrix { };
 }
 
-// @ts-ignore
-const pdf = require('pdf-parse');
-
 export async function parsePdf(buffer: Buffer): Promise<ParsedResume> {
     try {
-        const data: any = await pdf(buffer);
-        const fullText = data.text;
-        const info = data.info || {};
+        // Convert Buffer to Uint8Array
+        const data = new Uint8Array(buffer);
 
-        // Basic validation
+        // Load the document
+        const loadingTask = pdfjsLib.getDocument({
+            data,
+            useSystemFonts: true,
+            disableFontFace: true,
+            verbosity: 0
+        });
+
+        const doc = await loadingTask.promise;
+        const numPages = doc.numPages;
+        let fullText = '';
+        let info: any = {};
+
+        try {
+            const meta = await doc.getMetadata();
+            info = meta.info || {};
+        } catch (e) {
+            // ignore
+        }
+
+        for (let i = 1; i <= numPages; i++) {
+            const page = await doc.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map((item: any) => item.str).join(' ');
+            fullText += pageText + '\n\n';
+        }
+
         if (fullText.trim().length < 50) {
             throw new Error('PDF content too short or empty.');
         }
 
         const structure = extractStructure(fullText);
 
-        // Calculate confidence score
         let confidenceScore = 50;
         if (structure.experience.length > 0) confidenceScore += 15;
         if (structure.education.length > 0) confidenceScore += 15;
@@ -46,7 +69,7 @@ export async function parsePdf(buffer: Buffer): Promise<ParsedResume> {
         return {
             rawText: fullText,
             metadata: {
-                pageCount: data.numpages,
+                pageCount: numPages,
                 author: info.Author,
                 producer: info.Producer,
             },
