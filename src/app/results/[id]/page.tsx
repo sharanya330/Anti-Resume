@@ -78,7 +78,6 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
                                 <User size={20} />
                                 <h3>Recruiter (6s Scan)</h3>
                             </div>
-                            <div className={styles.score}>{recruiter.score}/100</div>
                         </div>
                         <div className={styles.verdict}>{recruiter.verdict}</div>
                         <ul className={styles.issueList}>
@@ -95,7 +94,6 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
                                 <Code size={20} />
                                 <h3>Senior Engineer</h3>
                             </div>
-                            <div className={styles.score}>{engineer.score || '?'}</div>
                         </div>
                         <div className={styles.verdict}>{engineer.verdict}</div>
                         <p className={styles.summary}>"{engineer.summary}"</p>
