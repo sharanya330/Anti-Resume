@@ -7,6 +7,11 @@ import { ArrowDown, CheckCircle2, AlertTriangle, Shield, Zap, FileSearch, BrainC
 export default function Home() {
   return (
     <div className={styles.container}>
+      {/* Temporary Render Check */}
+      <h1 style={{ padding: '20px', background: 'red', color: 'white', zIndex: 9999, position: 'relative' }}>
+        Anti-Resume Render Check
+      </h1>
+
       {/* Hero Section */}
       <section className={styles.hero}>
         <div className={styles.heroBackground}></div>
