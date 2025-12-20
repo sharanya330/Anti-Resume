@@ -1,58 +1,37 @@
 import { ParsedResume } from './types';
 import { extractStructure } from './structureExtractor';
 
-// Use ESM import for pdfjs-dist as it now defaults to .mjs
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
-import path from 'path';
+// Polyfill for pdfjs-dist in Node environment
+if (typeof Promise.withResolvers === 'undefined') {
+    // @ts-ignore
+    Promise.withResolvers = function () {
+        let resolve, reject;
+        const promise = new Promise((res, rej) => {
+            resolve = res;
+            reject = rej;
+        });
+        return { promise, resolve, reject };
+    };
+}
 
-// Explicitly set worker source for Node.js environment to avoid "fake worker" errors
-pdfjsLib.GlobalWorkerOptions.workerSrc = path.join(process.cwd(), 'node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs');
+// @ts-ignore
+if (typeof DOMMatrix === 'undefined') {
+    // @ts-ignore
+    global.DOMMatrix = class DOMMatrix { };
+}
+
+// @ts-ignore
+const pdf = require('pdf-parse');
 
 export async function parsePdf(buffer: Buffer): Promise<ParsedResume> {
     try {
-        // Convert Buffer to Uint8Array as expected by pdfjs-dist
-        const data = new Uint8Array(buffer);
-
-        // Load the document
-        const loadingTask = pdfjsLib.getDocument({
-            data,
-            // These options help avoid errors in Node.js environment
-            useSystemFonts: true,
-            disableFontFace: true,
-            verbosity: 0 // Suppress warnings
-        });
-
-        const doc = await loadingTask.promise;
-        const numPages = doc.numPages;
-        let fullText = '';
-        let info: any = {};
-
-        // Extract metadata
-        try {
-            const meta = await doc.getMetadata();
-            info = meta.info || {};
-        } catch (e) {
-            console.warn('Failed to extract metadata:', e);
-        }
-
-        // Extract text from all pages
-        for (let i = 1; i <= numPages; i++) {
-            const page = await doc.getPage(i);
-            const textContent = await page.getTextContent();
-
-            // Join items with space, but try to respect layout slightly
-            // pdfjs returns items with 'str' and 'transform' (position)
-            // For simple parsing, joining with space is usually enough
-            const pageText = textContent.items
-                .map((item: any) => item.str)
-                .join(' ');
-
-            fullText += pageText + '\n\n';
-        }
+        const data: any = await pdf(buffer);
+        const fullText = data.text;
+        const info = data.info || {};
 
         // Basic validation
         if (fullText.trim().length < 50) {
-            throw new Error('PDF content too short or empty. Possible image-only PDF.');
+            throw new Error('PDF content too short or empty.');
         }
 
         const structure = extractStructure(fullText);
@@ -67,7 +46,7 @@ export async function parsePdf(buffer: Buffer): Promise<ParsedResume> {
         return {
             rawText: fullText,
             metadata: {
-                pageCount: numPages,
+                pageCount: data.numpages,
                 author: info.Author,
                 producer: info.Producer,
             },
@@ -77,7 +56,6 @@ export async function parsePdf(buffer: Buffer): Promise<ParsedResume> {
 
     } catch (error: any) {
         console.error('PDF Parsing Error:', error);
-        // Enhance error message
         if (error.name === 'PasswordException') {
             throw new Error('PDF is password protected.');
         }
