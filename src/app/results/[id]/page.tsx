@@ -62,7 +62,6 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
                                 <FileText size={20} />
                                 <h3>ATS Bot</h3>
                             </div>
-                            <div className={styles.score}>{ats.score}/100</div>
                         </div>
                         <div className={styles.verdict}>{ats.verdict}</div>
                         <ul className={styles.issueList}>
